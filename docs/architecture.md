@@ -3,7 +3,7 @@
 ## Day 1: transport and telemetry
 
 ### Deployment
-[paste the block diagram from the plan]
+![Schema of the whole project](../assets/schema.png)
 
 SITL runs on the laptop (Fedora, inside a distrobox Ubuntu container)
 and forwards MAVLink over UDP. On Day 2 the same forwarding mechanism
@@ -11,29 +11,25 @@ feeds the Raspberry Pi.
 
 ### Module responsibilities
 
-**link.py** — <<< one sentence: what job it owns, including how it
-detects liveness >>>
-
+**link.py** — Owns the socket and tracks liveliness of the of the via autopilot HEARTBEATS
 It deliberately understands no message semantics. It filters out
-HEARTBEAT from ground stations, because <<< why? >>>
+HEARTBEAT from ground stations, because 
 
-**telemetry.py** — <<< one sentence >>>
-
-This is the ONLY place raw MAVLink units are converted.
+**telemetry.py** — Turns the MavLink stream into a single Vehicle State(which is like a bref of allthe figues and variables that will be concernd from this project). Patches the struct field by field as the messages arrive.
+This is the ONLY place raw MAVLink units are converted to their appropiate units.
 
 ### Why the split
 
-<<< two or three sentences: what the separation buys you >>>
-
+2 Files one own teh transport while the other owns the meanigns. Units get converted in exactly in  one placeto look. and since everythignis downstream reads a plain data classs. the health monitors, and saftey lgoic acn be unit tested agaisnt fabricatedstates with no sim running 
 ### VehicleState
+Vehicle state is like a liek a struct of all the figures and varialbes that are of concern for u in this project
 
-<<< one sentence: what it is >>>
 
 Fields not yet received are None, never 0.0 — a zero-volt battery
 reading would trip a false failsafe.
 
 ### MAVLink unit conversions
-[paste the unit table from the Day 1 walkthrough]
+![unit table which is the output of the]
 
 ### Observed SITL limitations
 - GPS: RTK_FIXED reported alongside HDOP 1.21. Fix type alone is not a
