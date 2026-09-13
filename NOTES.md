@@ -1,10 +1,30 @@
- # Day 1
+# GUARDIAN — build notes
 
- 1. Waht actually cost me the most tiem today?
- - Setting up ardupilot and acutally seeing the logs of the console and the map UI of ardupilot software. Moreover, understnadine eahca nd every figure that link.py and sniff.py ahs output and acutlaly understnading how often and at which frequncy whcih signals are being used and displayedont eh terminal and using those figures to find problems and unit coversion errors.
+## Day 1 — MAVLink, SITL, telemetry
 
- 2. Name one thing you now know that you didn't this morning?
- - Didn't know that HEARTBEAT comesa once / sec and that it is intentionalyl kept at ths frequncy so that the rest of the bandwidth is givent to the telementary. Morevoer, On how to run ardupilot env in distrobox
+**Time sink:** getting ArduPilot SITL running under distrobox, then
+reading the console/map output. Also spent real time working through
+what sniff.py reported — which messages exist, at what rate, and
+using those to catch unit-conversion mistakes.
 
- 3. What's the first thing you need to do tomorrow?
- - Complete Day 2 Taska and set up the Dietpi companion computer, and make it communicate with the flight controller.
+**Learned:**
+- HEARTBEAT is 1 Hz by design. A few missed beats is enough to declare
+  a dead link, and the saved bandwidth goes to telemetry — which matters
+  on a real 915 MHz radio.
+- How to run the ArduPilot dev environment in distrobox on Fedora.
+  Shared host networking means SITL and my Python talk over 127.0.0.1
+  with no port forwarding.
+
+**Anomalies found in my own output (→ limitations.md):**
+- GPS reported RTK_FIXED with HDOP 1.21 — contradictory on real
+  hardware. SITL's GPS model gives an optimistic fix type with no
+  matching error model. GPS monitor must not trust fix_type alone.
+- Battery hit 0% / 11199 mAh consumed and the aircraft kept hovering.
+  SITL models the electrical battery, not the consequence of draining it.
+
+**Gotcha:** ARMING_CHECK doesn't exist under that name in my build.
+Parameter names drift between ArduPilot versions — grep the saved
+parameter list rather than trusting docs. Matters on Day 7.
+
+**Tomorrow:** Day 2 — DietPi companion computer, guardian.service under
+systemd, SITL forwarding telemetry to the Pi over the LAN.
